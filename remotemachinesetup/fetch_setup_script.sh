@@ -64,5 +64,5 @@ else
 fi
 
 show-values
-download-setup-scripts
+# download-setup-scripts
 execute-setup-scripts
