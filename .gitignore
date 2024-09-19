@@ -1,0 +1,60 @@
+# Created by https://www.toptal.com/developers/gitignore/api/linux
+# Edit at https://www.toptal.com/developers/gitignore?templates=linux
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+# End of https://www.toptal.com/developers/gitignore/api/linux
+
+# for this specifice repository
+
+# all logs and errors
+*.logs
+*.errors
+
+# generated tools list for verification stage
+.allTools
+
+# env scripts
+*.env
+
+# generated list of locally installed tools through myinstaller
+.localAptPkgTools
+.localSnapPkgTools
+.localNpmPkgTools
+# Runtime created symlinks
+.fullAptPkgTools
+.fullSnapPkgTools
+.fullNpmPkgTools
+
+Dev_tools_setup_scripts/k8/config/.clusterconfig
+Dev_tools_setup_scripts/k8/config/.machineconfig
+Dev_tools_setup_scripts/k8/config/.credconfig
+.credconfig
+
+Env_setup_scripts/utilityScripts/mycrontab/.crontabs/.crontab-local
+Env_setup_scripts/utilityScripts/mycrontab/cronlogs/*.log
+Env_setup_scripts/utilityScripts/mycrontab/cronjobs/generated/*.sh
+
+Env_setup_scripts/utilityScripts/mycrontab/cronbackups/cron-defs/backup-*
+Env_setup_scripts/utilityScripts/mycrontab/cronbackups/mycron-defs/**/
+
+# Temporarily
+github
+# argocd
+
+.history
+
+gitignore/

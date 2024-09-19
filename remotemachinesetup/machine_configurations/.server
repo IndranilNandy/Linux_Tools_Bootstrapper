@@ -1,0 +1,33 @@
+# INTENDED FOR: vmTypes -> server
+
+# [OPTIONAL]        [default: dev]
+# VALUES            [min|default|dev|full]
+--type              full
+
+# [OPTIONAL]        [default: term]
+# VALUES            [term|file]
+--log-target        term
+
+# [OPTIONAL]        [default: <empty>]
+# VALUES            [<empty>|server-basic|server-minimal|server-dns]
+--custom-setup      server-basic
+
+# [OPTIONAL]        [default: no change]
+# VALUES            <hostname-template>
+--hostname          __VMTYPE__box__IP__
+
+# [MANDATORY]
+# VALUES            [server]@<machine-no>       [e.g. server@14, vmtype@machine-no]
+# NOTE              If no value is provided, then a default value 'server@251' assigned, but you've to change the static ip later
+--vminfo            server@251
+
+# [MANDATORY]
+# NOTE              base64 encoded              [echo "psd" | base64 -w0]
+--restore-pass
+
+# [MANDATORY]
+# NOTE              base64 encoded              [echo "psd" | base64 -w0]
+--gpg-pass
+
+# --mydata          This is non-configurable
+--mydata            /media/indranilnandy/MyData

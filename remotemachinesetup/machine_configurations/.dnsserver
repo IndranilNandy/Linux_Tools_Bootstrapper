@@ -1,0 +1,33 @@
+# INTENDED FOR: vmTypes -> custom
+
+# [OPTIONAL]        [default: dev]
+# VALUES            [min|default|dev|full]
+--type              full
+
+# [OPTIONAL]        [default: term]
+# VALUES            [term|file]
+--log-target        term
+
+# [OPTIONAL]        [default: <empty>]
+# VALUES            [<empty>|server-basic|server-minimal|server-dns]
+--custom-setup      server-dns
+
+# [OPTIONAL]        [default: no change]
+# VALUES            <hostname-template>
+--hostname          dnsserver__IP__
+
+# [MANDATORY]
+# VALUES            vmtype@<machine-no>       [e.g. custom@14]
+# NOTE              If no value is provided, then a default value 'custom@251' assigned, but you've to change the static ip later
+--vminfo            custom@251
+
+# [MANDATORY]
+# NOTE              base64 encoded              [echo "psd" | base64 -w0]
+--restore-pass
+
+# [MANDATORY]
+# NOTE              base64 encoded              [echo "psd" | base64 -w0]
+--gpg-pass
+
+# --mydata          This is non-configurable
+--mydata            /media/indranilnandy/MyData

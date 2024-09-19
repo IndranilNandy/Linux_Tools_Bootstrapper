@@ -1,0 +1,248 @@
+#!/bin/bash
+
+inst=
+log=
+cust=
+newhost=
+vminfo=
+restore_pass=
+gpg_pass=
+mydata_mount=
+
+# Valid values: cmd/file
+input_source=
+# Valid values: generic/k8
+config_type=generic
+# Valid values: stable/dev/any branch/any tag
+repo_version=dev
+# Valid values: yes/no
+init_setup=no
+
+setup-gcm() {
+    # ==============================
+    # hack for git
+    echo $gpg_pass >/tmp/gpg-pass
+    # ==============================
+
+    (
+        cd ../basic-prereqs/git
+        ./.setup
+    )
+}
+
+init() {
+    # sudo apt --fix-broken install -y
+    # yes | sudo apt update
+    # yes | sudo apt upgrade
+    # yes | sudo apt install git
+
+    setup-gcm
+
+    echo -e "Downloading the setup script..."
+    git clone -b "$repo_version" https://github.com/IndranilNandy/Linux_Tools.git ~/MyTools/Linux_Tools
+
+    cd ~/MyTools/Linux_Tools
+    git checkout dev
+    chmod +x .setup
+}
+
+read-from-command-line() {
+    # echo -e "Enter installation information"
+    read -p "type=? (min|default|dev|full) [default type: dev]" inst
+    read -p "log-target=? (term|file) [default log: term]" log
+    read -p "custom-setup=? (server-minimal/server-basic [default custom-setup: <empty>])" cust
+
+    # echo -e
+    # echo -e "Enter machine specific information"
+    read -p "Enter new hostname (NO HOSTNAME_PATTERN and NO SUFFIX, only 'exact name' for input_source of type 'cmd'): " newhost
+    read -p "Enter vminfo [e.g. dev@14/test@14/server@14/custom@14/k8@2:c:2/k8@2:w:3]: " vminfo
+
+    read -p "Enter backup restore passphrase (base64 encoded): " restore_pass
+    read -p "Enter gpg passphrase (base64 encoded): " gpg_pass
+    read -p "Enter MyData mount location: [Default: /media/$(whoami)/MyData] " mydata_mount
+}
+
+read-from-file() {
+    config_type="${1}"
+    config_file=
+    config_type=$(echo "$config_type" | tr '[:upper:]' '[:lower:]')
+
+    case "$config_type" in
+    generic | server | dnsserver | custom | k8)
+        config_file="./machine_configurations/."$config_type
+        ;;
+    *)
+        echo -e "Invalid argument: $config_type" && exit 1
+        ;;
+    esac
+
+    nano "$config_file"
+
+    inst=$(cat $config_file | grep -E -v " *#" | grep -e "^--type " | awk '{ print $2 }')
+    log=$(cat $config_file | grep -E -v " *#" | grep -e "^--log-target " | awk '{ print $2 }')
+    cust=$(cat $config_file | grep -E -v " *#" | grep -e "^--custom-setup " | awk '{ print $2 }')
+    newhost=$(cat $config_file | grep -E -v " *#" | grep -e "^--hostname " | awk '{ print $2 }')
+    vminfo=$(cat $config_file | grep -E -v " *#" | grep -e "^--vminfo " | awk '{ print $2 }')
+    restore_pass=$(cat $config_file | grep -E -v " *#" | grep -e "^--restore-pass " | awk '{ print $2 }')
+    gpg_pass=$(cat $config_file | grep -E -v " *#" | grep -e "^--gpg-pass " | awk '{ print $2 }')
+    mydata_mount=$(cat $config_file | grep -E -v " *#" | grep -e "^--mydata " | awk '{ print $2 }')
+}
+
+get-input() {
+    case $input_source in
+    cmd)
+        read-from-command-line
+        ;;
+    file)
+        read-from-file "$config_type"
+        ;;
+    *)
+        echo -e "Invalid argument: $input_source" && exit 1
+        ;;
+    esac
+}
+
+set-default-values() {
+    [[ -n "$inst" ]] || inst=dev
+    [[ -n "$log" ]] || log=term
+    [[ -n "$cust" ]] || cust=
+
+    [[ -n "$newhost" ]] || newhost=
+    [[ -n "$vminfo" ]] || vminfo=
+
+    [[ -n "$restore_pass" ]] || restore_pass=
+    [[ -n "$gpg_pass" ]] || gpg_pass=
+
+    # Remember: Since 'mybackup --restore' requires that the same directory hierarchies to be retained across systems for the 'restore' operation to know where to do 'inplace'
+    # restoration and since many files on this mount (MyData) are backed up in git for later restoration, same directory hierarchies must be followed across all systems.
+    # Hence, MyData should always be contrained to have 'SAME PATH' value across all systems. It MUST NOT be configurable with arbitrary values.
+    # Hence, we'll always use it as 'mydata/$(whoami)/MyData'
+    [[ -n "$mydata_mount" ]] || mydata_mount=/media/$(whoami)/MyData
+}
+
+show-assigned-values() {
+    echo -e "inst: $inst"
+    echo -e "log: $log"
+    echo -e "cust: $cust"
+    echo -e "newhost: $newhost"
+    echo -e "vminfo: $vminfo"
+    # echo -e "restore_pass: $restore_pass"
+    echo -e "restore_pass: NOT SHOWN"
+    # echo -e "gpg_pass: $gpg_pass"
+    echo -e "gpg_pass: NOT SHOWN"
+    echo -e "mydata_mount: $mydata_mount"
+}
+
+run-init-script() {
+    echo -e
+    echo -e "Running setup initialization script..."
+
+    echo -e
+    echo -e "./.setup --type=$inst \
+--log-target=$log \
+--custom-setup=$cust \
+--hostname=$newhost \
+--vminfo=$vminfo \
+--overwrite-configs \
+--inplace-restore \
+--init-setup \
+--restore-pass=$restore_pass \
+--gpg-pass=$gpg_pass \
+--mydata=$mydata_mount"
+
+    ./.setup \
+        --type=$inst \
+        --log-target=$log \
+        --custom-setup=$cust \
+        --hostname=$newhost \
+        --vminfo=$vminfo \
+        --overwrite-configs \
+        --inplace-restore \
+        --init-setup \
+        --restore-pass=$restore_pass \
+        --gpg-pass=$gpg_pass \
+        --mydata=$mydata_mount |
+        tee "$HOME"/.setup-log
+}
+
+run-setup-script() {
+    echo -e
+    echo -e "Running setup script..."
+
+    echo -e
+    echo -e "./.setup --type=$inst \
+--log-target=$log \
+--custom-setup=$cust \
+--hostname=$newhost \
+--vminfo=$vminfo \
+--restore-pass=$restore_pass \
+--gpg-pass=$gpg_pass \
+--mydata=$mydata_mount"
+
+    ./.setup \
+        --type=$inst \
+        --log-target=$log \
+        --custom-setup=$cust \
+        --hostname=$newhost \
+        --vminfo=$vminfo \
+        --restore-pass=$restore_pass \
+        --gpg-pass=$gpg_pass \
+        --mydata=$mydata_mount |
+        tee "$HOME"/.setup-log
+}
+
+if [[ "$#" -gt 0 ]]; then
+    for arg in "$@"; do
+        case $arg in
+        --input-source=*)
+            input_source=$(echo $arg | sed "s/--input-source=\(.*\)/\1/")
+            ;;
+        --config-type=*)
+            config_type=$(echo $arg | sed "s/--config-type=\(.*\)/\1/")
+            ;;
+        --repo-version=*)
+            repo_version=$(echo $arg | sed "s/--repo-version=\(.*\)/\1/")
+            ;;
+        --init-setup=*)
+            init_setup=$(echo $arg | sed "s/--init-setup=\(.*\)/\1/")
+            ;;
+        --help)
+            cat $(pwd)/.help && exit 0
+            ;;
+        *)
+            echo -e "Invalid argument: $arg" && exit 1
+            ;;
+        esac
+    done
+else
+    read -p "input-source=? (cmd|file) [default: cmd]... " input_source
+    [[ -n "$input_source" ]] || input_source=cmd
+
+    [[ "$input_source" == "file" ]] &&
+        {
+            read -p "config-type=? (generic [dev|test] | server | dnsserver | custom | k8) [default: generic]... " config_type
+            [[ -n "$config_type" ]] || config_type=generic
+        }
+
+    read -p "repo-version=? (dev [*latest]|stable|any branch|any tag) [default: dev]... " repo_version
+    [[ -n "$repo_version" ]] || repo_version=dev
+
+    read -p "Is it initial setup? init-setup= (yes|no) [default: no]... " init_setup
+    [[ -n "$init_setup" ]] || init_setup=no
+fi
+
+get-input
+set-default-values
+
+# There is no DEFAULT for restore-pass/gpg-pass. It MUST be supplied. Otherwise, would be asked at runtime
+[[ -n "$restore_pass" ]] || read -p "[MANDATORY]Enter backup restore passphrase (base64 encoded): " restore_pass
+[[ -n "$restore_pass" ]] || restore_pass=
+[[ -n "$gpg_pass" ]] || read -p "[MANDATORY] Enter gpg passphrase (base64 encoded): " gpg_pass
+[[ -n "$gpg_pass" ]] || gpg_pass=
+
+show-assigned-values
+init
+
+init_setup=$(echo "$init_setup" | tr '[:upper:]' '[:lower:]')
+[[ "$init_setup" == "yes" ]] && run-init-script
+[[ "$init_setup" == "no" ]] && run-setup-script

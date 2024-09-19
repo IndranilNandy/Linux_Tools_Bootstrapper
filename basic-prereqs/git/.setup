@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Check if it is already installed
+if [[ -n $(which git) ]]; then
+    echo -e "\n${GREEN}[git] Already installed..${RESET}"
+
+    dpkg-query -l gcm >/dev/null && echo -e "GCM is already installed and configured" || ./gcm_installer.sh
+
+    echo "Git configuration finished"
+else
+    echo -e "${YELLOW}[git] Setup process started.${RESET}"
+    ./git_installer.sh
+fi
+
+echo -e "${GREEN}[git] Setup finished.${RESET}"

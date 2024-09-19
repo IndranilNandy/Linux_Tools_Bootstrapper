@@ -1,0 +1,76 @@
+Brief:
+    There are THREE flags to control what tools will be installed in the machine.
+        --type                  (primary)
+        --custom-setup          (primary)
+        --config-type           (helper)
+
+    There is ONE more flag to determine hostname and unique static ip.
+        --vminfo
+
+#######################################################################################################################
+
+--type: (min|default|dev|full) [default type: dev]
+
+        This is the first level filter.
+        This is like a set of pre-customized packages.
+            full:   has all the tools installed.
+            dev:    has all the tools needed to be installed in a development machine, but not the tools needed for (say) standalone servers
+                    [e.g. dnsserver will be in 'full' package]
+            default: a subset of 'dev' tools
+            min:    a very minimal set of tools (subset of 'default')
+
+        (*) NOTE:   Generally, we'll use 'full' or 'dev', since default/min are too much customized, and may not be used in many places.
+                    If you need more control on what to be installed or not, you need a second filter (--custom-setup) on top of this.
+                    Generally, we use --custom-setup on top of 'full/dev' to have precise control on what to install.
+
+--custom-setup: (<empty>/server-minimal/server-basic [default custom-setup: <empty>])
+
+        This is second level filter to have more precise control on what to install or not
+        For any new custom choice, you can always create a new type in "Custom_setup_definitions".
+        This will explicitly list which tools (from 'full/dev') should be installed.
+        (*) NOTE: Please take care of the dependency graph when you are manually selecting what to install, though MOSTLY IT WILL BE TAKEN CARE OF BY '.prereq' files.
+
+        Currently available custom setup options are -
+            server-basic
+            server-minimal
+            server-dns
+
+------------------------------------------------------------------------------------------------------------------------
+THE ABOVE TWO FLAGS SHOULD BE ALL THAT WE NEED.
+Still we have two more additional flags -
+        - to ease the process of providing the parameters, and
+        - to generate hostname and allocate static ip for machines grouped by 'vmtype'
+------------------------------------------------------------------------------------------------------------------------
+
+--config-type: (generic [dev|test] | server | dnsserver | custom | k8) [default: generic]
+
+        This is used only if we provide the installation parameters (to .withGIT) using pre-made 'config-files'.
+        This basically maps to underlying '--type' and '--custom-setup' flags.
+
+        -------------------------------------------------------------------------------------------------
+        --config-type                       --type                              --custom-setup
+        -------------------------------------------------------------------------------------------------
+        .generic                            dev                                 <empty>
+        .server                             full                                server-basic
+        .k8                                 dev                                 server-basic
+        .dnsserver                          full                                server-dns
+        .custom                             dev                                 <you-need-to-fill-this>
+        -------------------------------------------------------------------------------------------------
+________________________________________________________________________________________________________________________
+________________________________________________________________________________________________________________________
+
+--vminfo: (vmtype@<machine-no>)
+
+        REMEMBER this flag does NOT decide what tools will be installed.
+        Instead, this is used to generate the hostname and determine unique static ip.
+        NOTE: These are the 'exact types' which your customized powershell script (Hyper-v_vm_automation) uses to create hyper-v virtual machines.
+
+        -------------------------------------------------------------------------------------------------
+        --vmtype                            hostname                            ip-range
+        -------------------------------------------------------------------------------------------------
+        dev                                 devbox<ip>                          2 <= x <= 20
+        test                                testbox<ip>                         21 <= x <= 50
+        server                              serverbox<ip>                       51 <= x <= 100
+        k8                                  k8-grp<grpno>-<nodetype><nodeno>    101 <= x <= 200
+        custom                              <provided-name>                     201 <= x <= 250
+        -------------------------------------------------------------------------------------------------

@@ -1,0 +1,25 @@
+# https://github.com/GitCredentialManager/git-credential-manager/blob/release/docs/credstores.md#gpgpass-compatible-files
+
+config_gcm() {
+    git-credential-manager-core configure
+    # git config --global credential.credentialStore secretservice
+    sudo apt install -y pass
+
+    # [TODO] User Real-Name and Email are hardcoded here. Handle this later along with the following hack
+    # This is a hack to generate gpg keys in script without any interaction
+    if [[ -f /tmp/gpg-pass ]]; then
+        gpg_pass=$(cat /tmp/gpg-pass | base64 -d)
+        yes | gpg --default-new-key-algo "ed25519/cert,sign+cv25519/encr" --quick-generate-key --pinentry-mode loopback --passphrase "$gpg_pass" 'indranilnandy <hi.i.am.indranil@gmail.com>' > temp_uid
+        # gpg --quick-gen-key --pinentry-mode loopback --passphrase "$gpg_pass" 'indranilnandy <hi.i.am.indranil@gmail.com>' ed25519 cert > temp_uid
+        # gpg --quick-gen-key --pinentry-mode loopback --passphrase "$gpg_pass" 'indranilnandy <hi.i.am.indranil@gmail.com>' ed25519 cert never > temp_uid
+        rm /tmp/gpg-pass
+    else
+        gpg --gen-key > temp_uid
+    fi
+
+    uid=$(cat temp_uid | grep uid | awk '{ print $2 }')
+    pass init "$uid"
+
+    git config --global credential.credentialStore gpg
+    rm temp_uid
+}

@@ -1,0 +1,33 @@
+# INTENDED FOR: vmTypes -> k8
+
+# [OPTIONAL]        [default: dev]
+# VALUES            [min|default|dev|full]
+--type              dev
+
+# [OPTIONAL]        [default: term]
+# VALUES            [term|file]
+--log-target        term
+
+# [OPTIONAL]        [default: <empty>]
+# VALUES            [<empty>|server-basic|server-minimal|server-dns]
+--custom-setup      server-basic
+
+# [OPTIONAL]        [default: no change]
+# VALUES            <hostname-template>
+--hostname          __VMTYPE__-grp__K8GRPNO__-__K8NODETYPE____K8NODENO__
+
+# [MANDATORY]
+# VALUES            k8@<group-no>:<node-type>:<node-no>       [e.g. k8@5:c:2]   [c: control node, w: worker node]   [max group no: 20, max control node no: 2, max worker node no: 3]
+# NOTE              If no value is provided, then a default value 'k8@20:w:3' assigned, but you've to change the static ip later
+--vminfo            k8@20:w:3
+
+# [MANDATORY]
+# NOTE              base64 encoded              [echo "psd" | base64 -w0]
+--restore-pass
+
+# [MANDATORY]
+# NOTE              base64 encoded              [echo "psd" | base64 -w0]
+--gpg-pass
+
+# --mydata          This is non-configurable
+--mydata            /media/indranilnandy/MyData
