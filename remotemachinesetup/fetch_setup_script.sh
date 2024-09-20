@@ -2,6 +2,8 @@
 
 server=
 port=
+# Values: git|httpserver [default: git]
+inst_medium=httpserver
 
 setup_dir="."
 config_dir="machine_configurations"
@@ -33,14 +35,26 @@ execute-setup-scripts() {
 }
 
 read-input-from-cmdline() {
-    read -p "Fetch from which server [default: devbox10] ? " server
-    read -p "Enter server-port (default: 9000] = " port
+    read -p "Installation medium [git|httpserver] [default: git] ? " inst_medium
+    [[ -n "$inst_medium" ]] || inst_medium=httpserver
 
-    [[ -n "$server" ]] || server=devbox10
-    [[ -n "$port" ]] || port=9000
+    if [[ "$inst_medium" == "httpserver" ]]; then
+        read -p "Fetch from which server [default: devbox10] ? " server
+        read -p "Enter server-port (default: 9000] = " port
+
+        [[ -n "$server" ]] || server=devbox10
+        [[ -n "$port" ]] || port=9000
+
+        curl http://$server:$port ||
+            {
+                inst_medium=git
+                echo -e "$server:$port is not available. Switching installation medium to $inst_medium"
+            }
+    fi
 }
 
 show-values() {
+    echo -e "Installation medium: $inst_medium"
     echo -e "server: $server"
     echo -e "port: $port"
 }
@@ -48,6 +62,9 @@ show-values() {
 if [[ "$#" -gt 0 ]]; then
     for arg in "$@"; do
         case $arg in
+        --medium=*)
+            inst_medium=$(echo $arg | sed "s/--medium=\(.*\)/\1/")
+            ;;
         --server=*)
             server=$(echo $arg | sed "s/--server=\(.*\)/\1/")
             ;;
@@ -59,10 +76,18 @@ if [[ "$#" -gt 0 ]]; then
             ;;
         esac
     done
+
+    if [[ "$inst_medium" == "httpserver" ]]; then
+        curl http://$server:$port ||
+            {
+                inst_medium=git
+                echo -e "$server:$port is not available. Switching installation medium to $inst_medium"
+            }
+    fi
 else
     read-input-from-cmdline
 fi
 
 show-values
-# download-setup-scripts
+[[ "$inst_medium" == "httpserver" ]] && echo -e "Downloading setup-scripts from server $server" && download-setup-scripts
 execute-setup-scripts
