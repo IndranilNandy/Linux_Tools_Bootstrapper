@@ -12,7 +12,7 @@ config_dir="machine_configurations"
     mkdir -p "$setup_dir"/"$config_dir" ||
     sudo mkdir -p "$setup_dir"/"$config_dir"
 
-download-setup-scripts() {
+download-setup-scripts-from-server() {
     # curl "http://$server:$port/data/$server/ubuntu-setup/.withGIT" -o "$setup_dir"/.withGIT
 
     echo -e "Overriding existing machine-config files with more specific ones received from the server"
@@ -22,7 +22,7 @@ download-setup-scripts() {
     curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.custom" -o "$setup_dir"/"$config_dir"/.custom
     curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.k8" -o "$setup_dir"/"$config_dir"/.k8
 
-    chmod +x "$setup_dir"/.withGIT
+    # chmod +x "$setup_dir"/.withGIT
 }
 
 execute-setup-scripts() {
@@ -32,11 +32,16 @@ execute-setup-scripts() {
 
 read-input-from-cmdline() {
     read -p "Installation medium [git|httpserver] [default: git] ? " inst_medium
+    inst_medium=$(echo $inst_medium | tr [:upper:] [:lower:])
+
     [[ -n "$inst_medium" ]] || inst_medium=httpserver
 
     if [[ "$inst_medium" == "httpserver" ]]; then
         read -p "Fetch from which server [default: devbox10] ? " server
+        server=$(echo $server | tr [:upper:] [:lower:])
+
         read -p "Enter server-port (default: 9000] = " port
+        port=$(echo $port | tr [:upper:] [:lower:])
 
         [[ -n "$server" ]] || server=devbox10
         [[ -n "$port" ]] || port=9000
@@ -60,12 +65,15 @@ if [[ "$#" -gt 0 ]]; then
         case $arg in
         --medium=*)
             inst_medium=$(echo $arg | sed "s/--medium=\(.*\)/\1/")
+            inst_medium=$(echo $inst_medium | tr [:upper:] [:lower:])
             ;;
         --server=*)
             server=$(echo $arg | sed "s/--server=\(.*\)/\1/")
+            server=$(echo $server | tr [:upper:] [:lower:])
             ;;
         --port=*)
             port=$(echo $arg | sed "s/--port=\(.*\)/\1/")
+            port=$(echo $port | tr [:upper:] [:lower:])
             ;;
         *)
             echo -e "Invalid argument: $arg" && exit 1
@@ -85,5 +93,5 @@ else
 fi
 
 show-values
-[[ "$inst_medium" == "httpserver" ]] && echo -e "Downloading setup-scripts from server $server" && download-setup-scripts
+[[ "$inst_medium" == "httpserver" ]] && echo -e "Downloading setup-scripts from server $server" && download-setup-scripts-from-server
 execute-setup-scripts

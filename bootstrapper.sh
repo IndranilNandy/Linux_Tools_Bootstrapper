@@ -16,6 +16,7 @@ bootstrap() {
     find . -name "*.sh" -exec chmod +x {} \;
     # Enable execution permission on all .setup
     find . -name ".setup" -exec chmod +x {} \;
+    chmod +x ./remotemachinesetup/.withGIT
 
     (
         cd remotemachinesetup
