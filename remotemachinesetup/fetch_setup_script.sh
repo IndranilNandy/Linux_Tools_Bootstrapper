@@ -31,7 +31,7 @@ execute-setup-scripts() {
 }
 
 read-input-from-cmdline() {
-    read -p "Installation medium [git|httpserver] [default: git] ? " inst_medium
+    read -p "Installation medium [git|httpserver] [default: httpserver] ? " inst_medium
     inst_medium=$(echo $inst_medium | tr [:upper:] [:lower:])
 
     [[ -n "$inst_medium" ]] || inst_medium=httpserver
