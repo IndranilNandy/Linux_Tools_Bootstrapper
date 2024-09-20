@@ -13,23 +13,19 @@ config_dir="machine_configurations"
     sudo mkdir -p "$setup_dir"/"$config_dir"
 
 download-setup-scripts() {
-    curl "http://devbox10:9000/data/devbox10/ubuntu-setup/.withGIT" -o "$setup_dir"/.withGIT
+    # curl "http://$server:$port/data/$server/ubuntu-setup/.withGIT" -o "$setup_dir"/.withGIT
 
-    curl "http://devbox10:9000/data/devbox10/ubuntu-setup/.generic" -o "$setup_dir"/"$config_dir"/.generic
-    curl "http://devbox10:9000/data/devbox10/ubuntu-setup/.server" -o "$setup_dir"/"$config_dir"/.server
-    curl "http://devbox10:9000/data/devbox10/ubuntu-setup/.dnsserver" -o "$setup_dir"/"$config_dir"/.dnsserver
-    curl "http://devbox10:9000/data/devbox10/ubuntu-setup/.custom" -o "$setup_dir"/"$config_dir"/.custom
-    curl "http://devbox10:9000/data/devbox10/ubuntu-setup/.k8" -o "$setup_dir"/"$config_dir"/.k8
+    echo -e "Overriding existing machine-config files with more specific ones received from the server"
+    curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.generic" -o "$setup_dir"/"$config_dir"/.generic
+    curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.server" -o "$setup_dir"/"$config_dir"/.server
+    curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.dnsserver" -o "$setup_dir"/"$config_dir"/.dnsserver
+    curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.custom" -o "$setup_dir"/"$config_dir"/.custom
+    curl "http://$server:$port/data/$server/ubuntu-setup/local_configs/.k8" -o "$setup_dir"/"$config_dir"/.k8
 
     chmod +x "$setup_dir"/.withGIT
 }
 
 execute-setup-scripts() {
-    # ./"$setup_dir"/.withGIT --input-source=file --config-type=generic --repo-version=dev
-    # ./"$setup_dir"/.withGIT --input-source=file --config-type=generic --repo-version=stable
-    # ./"$setup_dir"/.withGIT --input-source=file --config-type=k8 --repo-version=dev
-    # ./"$setup_dir"/.withGIT --input-source=file --config-type=k8 --repo-version=stable
-
     # [REMEMBER]: EITHER PROVIDE ALL THE ARGUMENTS OR NONE
     ./"$setup_dir"/.withGIT
 }
