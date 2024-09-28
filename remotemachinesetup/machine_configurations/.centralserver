@@ -10,11 +10,11 @@
 
 # [OPTIONAL]        [default: <empty>]
 # VALUES            [<empty>|server-basic|server-minimal|server-dns|server-central]
---custom-setup      server-dns
+--custom-setup      server-central
 
 # [OPTIONAL]        [default: no change]
 # VALUES            <hostname-template>
---hostname          dnsserver__IP__
+--hostname          central-server__IP__
 
 # [MANDATORY]
 # VALUES            vmtype@<machine-no>       [e.g. custom@14]

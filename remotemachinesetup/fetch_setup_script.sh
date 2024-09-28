@@ -17,6 +17,7 @@ download-setup-scripts-from-server() {
     curl "http://$server:$port/data/$server/ubuntu-setup/secrets/machine_configurations/local_configs/.generic" -o "$setup_dir"/"$config_dir"/.generic
     curl "http://$server:$port/data/$server/ubuntu-setup/secrets/machine_configurations/local_configs/.server" -o "$setup_dir"/"$config_dir"/.server
     curl "http://$server:$port/data/$server/ubuntu-setup/secrets/machine_configurations/local_configs/.dnsserver" -o "$setup_dir"/"$config_dir"/.dnsserver
+    curl "http://$server:$port/data/$server/ubuntu-setup/secrets/machine_configurations/local_configs/.centralserver" -o "$setup_dir"/"$config_dir"/.centralserver
     curl "http://$server:$port/data/$server/ubuntu-setup/secrets/machine_configurations/local_configs/.custom" -o "$setup_dir"/"$config_dir"/.custom
     curl "http://$server:$port/data/$server/ubuntu-setup/secrets/machine_configurations/local_configs/.k8" -o "$setup_dir"/"$config_dir"/.k8
 }

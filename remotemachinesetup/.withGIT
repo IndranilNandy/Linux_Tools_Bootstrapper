@@ -68,7 +68,7 @@ read-from-file() {
     config_type=$(echo "$config_type" | tr '[:upper:]' '[:lower:]')
 
     case "$config_type" in
-    generic | server | dnsserver | custom | k8)
+    generic | server | dnsserver | centralserver | custom | k8)
         config_file="./machine_configurations/."$config_type
         ;;
     *)
@@ -220,7 +220,7 @@ else
 
     [[ "$input_source" == "file" ]] &&
         {
-            read -p "config-type=? (generic [dev|test] | server | dnsserver | custom | k8) [default: generic]... " config_type
+            read -p "config-type=? (generic [dev|test] | server | dnsserver | centralserver | custom | k8) [default: generic]... " config_type
             [[ -n "$config_type" ]] || config_type=generic
         }
 

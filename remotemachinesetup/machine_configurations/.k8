@@ -9,7 +9,7 @@
 --log-target        term
 
 # [OPTIONAL]        [default: <empty>]
-# VALUES            [<empty>|server-basic|server-minimal|server-dns]
+# VALUES            [<empty>|server-basic|server-minimal|server-dns|server-central]
 --custom-setup      server-basic
 
 # [OPTIONAL]        [default: no change]

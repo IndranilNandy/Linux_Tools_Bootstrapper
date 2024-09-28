@@ -42,7 +42,7 @@ Still we have two more additional flags -
         - to generate hostname and allocate static ip for machines grouped by 'vmtype'
 ------------------------------------------------------------------------------------------------------------------------
 
---config-type: (generic [dev|test] | server | dnsserver | custom | k8) [default: generic]
+--config-type: (generic [dev|test] | server | dnsserver | centralserver | custom | k8) [default: generic]
 
         This is used only if we provide the installation parameters (to .withGIT) using pre-made 'config-files'.
         This basically maps to underlying '--type' and '--custom-setup' flags.
@@ -54,6 +54,7 @@ Still we have two more additional flags -
         .server                             full                                server-basic
         .k8                                 dev                                 server-basic
         .dnsserver                          full                                server-dns
+        .centralserver                      full                                server-central
         .custom                             dev                                 <you-need-to-fill-this>
         -------------------------------------------------------------------------------------------------
 ________________________________________________________________________________________________________________________
