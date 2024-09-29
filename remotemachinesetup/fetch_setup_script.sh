@@ -37,7 +37,7 @@ read-input-from-cmdline() {
         read -p "Fetch from which server [default: central-server57] ? " server
         server=$(echo $server | tr [:upper:] [:lower:])
 
-        read -p "Enter server-port (default: 9000] = " port
+        read -p "Enter server-port (default: 9090] = " port
         port=$(echo $port | tr [:upper:] [:lower:])
 
         [[ -n "$server" ]] || server=central-server57
