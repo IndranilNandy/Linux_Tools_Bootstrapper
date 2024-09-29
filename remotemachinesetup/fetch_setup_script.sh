@@ -34,14 +34,14 @@ read-input-from-cmdline() {
     [[ -n "$inst_medium" ]] || inst_medium=httpserver
 
     if [[ "$inst_medium" == "httpserver" ]]; then
-        read -p "Fetch from which server [default: devbox10] ? " server
+        read -p "Fetch from which server [default: central-server57] ? " server
         server=$(echo $server | tr [:upper:] [:lower:])
 
         read -p "Enter server-port (default: 9000] = " port
         port=$(echo $port | tr [:upper:] [:lower:])
 
-        [[ -n "$server" ]] || server=devbox10
-        [[ -n "$port" ]] || port=9000
+        [[ -n "$server" ]] || server=central-server57
+        [[ -n "$port" ]] || port=9090
 
         curl http://$server:$port ||
             {
